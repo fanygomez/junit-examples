@@ -98,23 +98,36 @@ class CuentaTest {
         banco.addCuenta(cuenta2);
 
         banco.transferir(cuenta2,cuenta1, new BigDecimal(500));
+        //Agrupacion
+        assertAll(
+                () -> { assertEquals("1000.8989",cuenta2.getSaldo().toPlainString());},
+                () -> { assertEquals("3000",cuenta1.getSaldo().toPlainString()); } ,
+                () -> { assertEquals("3000",cuenta1.getSaldo().toPlainString());},
+                () -> { assertEquals(2,banco.getCuentas().size());},
+                () -> { assertEquals(2,banco.getCuentas().size());},
+                () -> { assertEquals("Banco Agri",cuenta1.getBanco().getNombre()); },
+                () -> { assertEquals("Sebas", banco.getCuentas().stream().
+                        filter(cuenta -> cuenta.getPersona().equals("Sebas"))
+                        .findFirst()
+                        .get().getPersona());
+                        },
+                ()-> assertFalse(banco.getCuentas().stream().
+                    anyMatch(cuenta -> cuenta.getPersona().equals("Jose G")))
+                );
 
-        assertEquals("1000.8989",cuenta2.getSaldo().toPlainString());
-        assertEquals("3000",cuenta1.getSaldo().toPlainString());
+
         //validar relacion
         //cuenta -> bancoss
-        assertEquals(2,banco.getCuentas().size());
+        //assertEquals(2,banco.getCuentas().size());
         //Relacion banco -> cuenta
-        assertEquals("Banco Agri",cuenta1.getBanco().getNombre());
+        //assertEquals("Banco Agricola",cuenta1.getBanco().getNombre());
 
         //Buscar en la lista de cuentas el nombre de Sebas
-        assertEquals("Sebas", banco.getCuentas().stream().
-                filter(cuenta -> cuenta.getPersona().equals("Sebas"))
-                    .findFirst()
-        .get().getPersona());
+//        assertEquals("Sebas", banco.getCuentas().stream().
+//                filter(cuenta -> cuenta.getPersona().equals("Sebas"))
+//                    .findFirst()
+//        .get().getPersona());
 
         //
-        assertFalse(banco.getCuentas().stream().
-                anyMatch(cuenta -> cuenta.getPersona().equals("Jose G")));
     }
 }
