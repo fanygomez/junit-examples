@@ -5,8 +5,10 @@ import org.junit.jupiter.api.condition.*;
 import org.sgomez.junit5app.example.exceptions.DineroInsuficienteException;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
@@ -265,4 +267,31 @@ class CuentaTest {
     @EnabledIfEnvironmentVariable(named = "ENVIRONMENT",matches = "prod")
     void testProd() {
     }
+
+    /**
+     * Test: timeout
+     */
+    @Nested
+    @Tag("Timeout")
+    class ejemploTimeoutTest{
+        @Test
+        @Timeout(5)
+        void testTimeOut() throws InterruptedException {
+            TimeUnit.SECONDS.sleep(4);
+        }
+
+        @Test
+        @Timeout(value = 1000, unit = TimeUnit.MILLISECONDS)
+        void testTimeOut2() throws InterruptedException {
+            TimeUnit.SECONDS.sleep(1);
+        }
+
+        @Test
+        void testTimeoutAssertions() throws InterruptedException {
+            assertTimeout(Duration.ofSeconds(5000), ()->{
+                TimeUnit.SECONDS.sleep(5);
+            });
+        }
+    }
+
 }
