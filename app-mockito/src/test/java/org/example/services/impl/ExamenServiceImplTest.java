@@ -2,6 +2,7 @@ package org.example.services.impl;
 
 import org.example.models.Examen;
 import org.example.repositories.ExamenRepository;
+import org.example.repositories.PreguntasRepository;
 import org.example.repositories.impl.ExamenRepositoryImpl;
 import org.example.services.IExamenService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,11 +19,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class ExamenServiceImplTest {
     ExamenRepository repository;
     IExamenService service;
+    PreguntasRepository  preguntasRepository;
+
     @BeforeEach
     void setUp() {
         //preparar escenario
         repository = mock(ExamenRepository.class); // ( clase a simular )
-        service = new ExamenServiceImpl(repository);
+        preguntasRepository = mock(PreguntasRepository.class);
+        service = new ExamenServiceImpl(repository,preguntasRepository);
 
     }
 
@@ -30,13 +34,13 @@ class ExamenServiceImplTest {
     void findExamenPorNombre() {
 //        ExamenRepository examenRepository = new ExamenRepositoryImpl();
 
-        List<Examen> datos = Arrays.asList(
-                new Examen(5L,"Math"),
-                new Examen(6L,"History"),
-                new Examen(7L,"Tech")
-        );
+//        List<Examen> datos = Arrays.asList(
+//                new Examen(5L,"Math"),
+//                new Examen(6L,"History"),
+//                new Examen(7L,"Tech")
+//        );
 
-        when(repository.findAll()).thenReturn(datos);
+        when(repository.findAll()).thenReturn(Datos.EXAMEN_LIST);
         Optional<Examen> examen = service.findExamenPorNombre("Math");
         // Junit
         assertTrue(examen.isPresent());
@@ -48,7 +52,6 @@ class ExamenServiceImplTest {
     void findExamenPorNombrelistaVacia() {
 //        ExamenRepository examenRepository = new ExamenRepositoryImpl();
        repository = mock(ExamenRepository.class); // ( clase a simular )
-       service = new ExamenServiceImpl(repository);
 
         List<Examen> datos = Collections.emptyList();
 
@@ -57,5 +60,46 @@ class ExamenServiceImplTest {
         // Junit
         assertFalse(examen.isPresent());
 
+    }
+
+    @Test
+    void testPreguntasExamen() {
+    when(repository.findAll()).thenReturn(Datos.EXAMEN_LIST);
+//    when(preguntasRepository.findPreguntasPorExamenId(5L)).thenReturn(Datos.Preguntas_LIST);
+    when(preguntasRepository.findPreguntasPorExamenId(anyLong())).thenReturn(Datos.Preguntas_LIST);
+
+    Examen examen = service.findExamenPorNombreConPreguntas("Math");
+    assertEquals(5,examen.getPreguntas().size());
+    assertTrue(examen.getPreguntas().contains("integrales"));
+    }
+
+    @Test
+    void testPreguntasExamenVerifyMethod() {
+        when(repository.findAll()).thenReturn(Datos.EXAMEN_LIST);
+//    when(preguntasRepository.findPreguntasPorExamenId(5L)).thenReturn(Datos.Preguntas_LIST);
+        when(preguntasRepository.findPreguntasPorExamenId(anyLong())).thenReturn(Datos.Preguntas_LIST);
+
+        Examen examen = service.findExamenPorNombreConPreguntas("Math");
+        assertEquals(5,examen.getPreguntas().size());
+        assertTrue(examen.getPreguntas().contains("integrales"));
+
+        //verificar si se llama los  metodos dentro del service impl
+        //verificar interaccion con el mock
+        verify(repository).findAll();
+        verify(preguntasRepository).findPreguntasPorExamenId(anyLong());
+    }
+
+    @Test
+    void testNoExisteExamenVerify() {
+        when(repository.findAll()).thenReturn(Collections.emptyList());
+//    when(preguntasRepository.findPreguntasPorExamenId(5L)).thenReturn(Datos.Preguntas_LIST);
+        when(preguntasRepository.findPreguntasPorExamenId(anyLong())).thenReturn(Datos.Preguntas_LIST);
+
+        Examen examen = service.findExamenPorNombreConPreguntas("Math");
+        assertNull(examen);
+        //verificar si se llama los  metodos dentro del service impl
+        //verificar interaccion con el mock
+        verify(repository).findAll();
+        verify(preguntasRepository).findPreguntasPorExamenId(5L);
     }
 }
