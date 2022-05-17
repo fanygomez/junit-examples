@@ -8,4 +8,5 @@ public interface IExamenService {
     Optional<Examen> findExamenPorNombre(String nombre);
 
     Examen findExamenPorNombreConPreguntas(String nombre);
+    Examen guardarExamen(Examen examen);
 }

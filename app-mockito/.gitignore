@@ -1,2 +1,3 @@
 .idea/libraries/
 target/*
+/target/classes/

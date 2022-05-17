@@ -8,6 +8,11 @@ import java.util.List;
 
 public class ExamenRepositoryImpl implements ExamenRepository {
     @Override
+    public Examen save(Examen examen) {
+        return examen;
+    }
+
+    @Override
     public List<Examen> findAll() {
         return Arrays.asList(
                 new Examen(5L,"Math"),

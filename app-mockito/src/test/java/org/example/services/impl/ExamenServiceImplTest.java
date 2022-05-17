@@ -4,29 +4,39 @@ import org.example.models.Examen;
 import org.example.repositories.ExamenRepository;
 import org.example.repositories.PreguntasRepository;
 import org.example.repositories.impl.ExamenRepositoryImpl;
-import org.example.services.IExamenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class) //Habilitar
 class ExamenServiceImplTest {
+    @Mock
     ExamenRepository repository;
-    IExamenService service;
+    @Mock
     PreguntasRepository  preguntasRepository;
+    @InjectMocks
+    ExamenServiceImpl service;
 
     @BeforeEach
     void setUp() {
         //preparar escenario
-        repository = mock(ExamenRepository.class); // ( clase a simular )
-        preguntasRepository = mock(PreguntasRepository.class);
-        service = new ExamenServiceImpl(repository,preguntasRepository);
+        //MockitoAnnotations.openMocks(this); //activar
+
+//        repository = mock(ExamenRepository.class); // ( clase a simular )
+//        preguntasRepository = mock(PreguntasRepository.class);
+//        service = new ExamenServiceImpl(repository,preguntasRepository);
 
     }
 
@@ -101,5 +111,11 @@ class ExamenServiceImplTest {
         //verificar interaccion con el mock
         verify(repository).findAll();
         verify(preguntasRepository).findPreguntasPorExamenId(5L);
+    }
+
+    @Test
+    void testGuardarExamen() {
+        when(repository.save(any(Examen.class))).thenReturn(Datos.EXAMEN);
+        Examen examen = service.guardarExamen(Datos.EXAMEN);
     }
 }
