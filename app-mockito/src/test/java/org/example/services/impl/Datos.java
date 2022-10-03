@@ -11,6 +11,16 @@ public class Datos {
             new Examen(6L,"History"),
             new Examen(7L,"Tech")
     );
+    public final static List<Examen> EXAMEN_LIST_ID_NULL = Arrays.asList(
+            new Examen(null,"Math"),
+            new Examen(null,"History"),
+            new Examen(null,"Tech")
+    );
+    public final static List<Examen> EXAMEN_LIST_ID_NEGATIVOS = Arrays.asList(
+//            new Examen(-6L,"Math"),
+            new Examen(null,"History"),
+            new Examen(null,"Tech")
+    );
 
     public final static List<String> Preguntas_LIST = Arrays.asList(
             "aritmetica",

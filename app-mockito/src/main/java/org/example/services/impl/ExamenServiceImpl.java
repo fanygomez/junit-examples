@@ -47,7 +47,7 @@ public class ExamenServiceImpl implements IExamenService {
     @Override
     public Examen guardarExamen(Examen examen) {
         if (!examen.getPreguntas().isEmpty()){
-            preguntasRepository.guardarList(examen.getPreguntas());
+            preguntasRepository.saveList(examen.getPreguntas());
         }
         return examenRepository.save(examen);
     }
