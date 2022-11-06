@@ -263,4 +263,14 @@ class ExamenServiceImplTest {
         verify(repository).save(any(Examen.class));
         verify(preguntasRepository).saveList(anyList());
     }
+
+    @Test
+    void testDoCallRealMethod() {
+        when(repository.findAll()).thenReturn(Datos.EXAMEN_LIST);
+//        when(preguntasRepository.findPreguntasPorExamenId(anyLong())).thenReturn(Datos.Preguntas_LIST);
+        doCallRealMethod().when(preguntasRepository).findPreguntasPorExamenId(anyLong());
+        Examen examen = service.findExamenPorNombreConPreguntas("Math");
+        assertEquals(5L, examen.getId());
+
+    }
 }
