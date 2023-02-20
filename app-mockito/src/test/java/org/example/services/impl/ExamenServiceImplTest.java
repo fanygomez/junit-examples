@@ -4,6 +4,8 @@ import org.example.models.Examen;
 import org.example.repositories.ExamenRepository;
 import org.example.repositories.PreguntasRepository;
 import org.example.repositories.impl.ExamenRepositoryImpl;
+import org.example.repositories.impl.PreguntasRepositoryImpl;
+import org.example.services.IExamenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,9 +28,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class ExamenServiceImplTest {
     //Given
     @Mock
-    ExamenRepository repository;
+    ExamenRepositoryImpl repository;
     @Mock
-    PreguntasRepository  preguntasRepository;
+    PreguntasRepositoryImpl preguntasRepository;
     @InjectMocks
     ExamenServiceImpl service;
 
@@ -39,8 +41,8 @@ class ExamenServiceImplTest {
         //preparar escenario
         //MockitoAnnotations.openMocks(this); //activar
 
-//        repository = mock(ExamenRepository.class); // ( clase a simular )
-//        preguntasRepository = mock(PreguntasRepository.class);
+//        repository = mock(ExamenRepositoryImpl.class); // ( clase a simular )
+//        preguntasRepository = mock(PreguntasRepositoryImpl.class);
 //        service = new ExamenServiceImpl(repository,preguntasRepository);
 
     }
@@ -66,7 +68,7 @@ class ExamenServiceImplTest {
     @Test
     void findExamenPorNombrelistaVacia() {
 //        ExamenRepository examenRepository = new ExamenRepositoryImpl();
-       repository = mock(ExamenRepository.class); // ( clase a simular )
+       repository = mock(ExamenRepositoryImpl.class); // ( clase a simular )
 
         List<Examen> datos = Collections.emptyList();
 
@@ -272,5 +274,97 @@ class ExamenServiceImplTest {
         Examen examen = service.findExamenPorNombreConPreguntas("Math");
         assertEquals(5L, examen.getId());
 
+    }
+
+    /**
+     * spy = hybrid de objet real y un mock, requiere que se cree desde una clase concreta y no de una clase abstract o interface
+     *   -> Es un clon del objeto real pero con caracteristicas de un mock
+     * mock: llamada simulada, podemos usar interface, abstract class or class, al final los metodos se van simular
+     */
+    @Test
+    void testSpy() {
+        ExamenRepository examenRepository = spy(ExamenRepositoryImpl.class);
+        PreguntasRepository preguntasRepository = spy(PreguntasRepositoryImpl.class);
+        IExamenService examenService = new ExamenServiceImpl(examenRepository,preguntasRepository);
+        List<String> preguntas = Arrays.asList("Teach");
+        //mock
+//        when(preguntasRepository.findPreguntasPorExamenId(anyLong())).thenReturn(preguntas);
+        doReturn(preguntas).when(preguntasRepository).findPreguntasPorExamenId(anyLong());
+        //metodo real
+        Examen examen = examenService.findExamenPorNombreConPreguntas("Math");
+        assertEquals(5,examen.getId());
+        assertEquals("Math",examen.getNombre());
+        assertEquals(1,examen.getPreguntas().size());
+        assertTrue(examen.getPreguntas().contains("Teach"));
+
+        verify(examenRepository).findAll();
+        verify(preguntasRepository).findPreguntasPorExamenId(anyLong());
+    }
+
+    @Test
+    void testOrdenDeInvocaciones() {
+        when(repository.findAll()).thenReturn(Datos.EXAMEN_LIST);
+
+        service.findExamenPorNombreConPreguntas("Math");
+        service.findExamenPorNombreConPreguntas("Tech");
+        InOrder inOrder = inOrder(preguntasRepository);
+        inOrder.verify(preguntasRepository).findPreguntasPorExamenId(5L);
+        inOrder.verify(preguntasRepository).findPreguntasPorExamenId(7L);
+    }
+
+    @Test
+    void testOrdenDeInvocaciones2() {
+        when(repository.findAll()).thenReturn(Datos.EXAMEN_LIST);
+
+        service.findExamenPorNombreConPreguntas("Math");
+        service.findExamenPorNombreConPreguntas("Tech");
+        InOrder inOrder = inOrder(repository,preguntasRepository);//mock a verificar
+
+        inOrder.verify(repository).findAll();
+        inOrder.verify(preguntasRepository).findPreguntasPorExamenId(5L);
+        inOrder.verify(preguntasRepository).findPreguntasPorExamenId(7L);
+    }
+
+    @Test
+    void testNumeroDeInvocaciones(){
+        when(repository.findAll()).thenReturn(Datos.EXAMEN_LIST);
+        service.findExamenPorNombreConPreguntas("Math");
+
+        verify(preguntasRepository).findPreguntasPorExamenId(5L);
+        verify(preguntasRepository,times(1)).findPreguntasPorExamenId(5L);
+        verify(preguntasRepository,atLeast(1)).findPreguntasPorExamenId(5L);
+        verify(preguntasRepository,atLeastOnce()).findPreguntasPorExamenId(5L);
+        verify(preguntasRepository,atMost(1)).findPreguntasPorExamenId(5L);
+        verify(preguntasRepository,atMostOnce()).findPreguntasPorExamenId(5L);
+    }
+
+    /**
+     * Numero de invocaciones del metodo findPreguntasPorExamenId
+     */
+    @Test
+    void testNumeroDeInvocaciones2(){
+        when(repository.findAll()).thenReturn(Datos.EXAMEN_LIST);
+        service.findExamenPorNombreConPreguntas("Math");
+
+//        verify(preguntasRepository).findPreguntasPorExamenId(5L);
+        verify(preguntasRepository,times(2)).findPreguntasPorExamenId(5L);
+        verify(preguntasRepository,atLeast(2)).findPreguntasPorExamenId(5L);
+        verify(preguntasRepository,atLeastOnce()).findPreguntasPorExamenId(5L);
+        verify(preguntasRepository,atMost(2)).findPreguntasPorExamenId(5L);
+//        verify(preguntasRepository,atMostOnce()).findPreguntasPorExamenId(5L);
+    }
+    @Test
+    void testNumeroDeInvocaciones3(){
+//        when(repository.findAll()).thenReturn(Datos.EXAMEN_LIST);
+        when(repository.findAll()).thenReturn(Collections.emptyList());
+        service.findExamenPorNombreConPreguntas("Math");
+
+        verify(preguntasRepository,never()).findPreguntasPorExamenId(5L);
+        verifyNoInteractions(preguntasRepository);
+        verify(repository).findAll();
+        verify(repository,times(2)).findAll();
+        verify(repository,atLeast(2)).findAll();
+        verify(repository,atLeastOnce()).findAll();
+        verify(repository,atMost(2)).findAll();
     }
 }
