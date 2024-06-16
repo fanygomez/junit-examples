@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.sgomez.test.springboot.app.exceptions.MoneyIsNotEnoughException;
 
 import java.math.BigDecimal;
+import java.util.Objects;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -23,5 +25,18 @@ public class Account {
     }
     public void credit(BigDecimal amount){
         this.balance = this.balance.add(amount);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(id, account.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
