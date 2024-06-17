@@ -44,9 +44,9 @@ class SpringbootTestApplicationTests {
 
 	@Test
 	void contextLoads() {
-		when(accountRepository.findById(1L)).thenReturn(Data.Account_OO1);
-		when(accountRepository.findById(2L)).thenReturn(Data.Account_OO2);
-		when(bankRepository.findById(1L)).thenReturn(Data.BANK);
+		when(accountRepository.findById(1L)).thenReturn(mockCreateAccount001());
+		when(accountRepository.findById(2L)).thenReturn(mockCreateAccount002());
+		when(bankRepository.findById(1L)).thenReturn(mockCreateBank());
 
 		BigDecimal originalBalance = accountService.checkBalance(1L);
 		BigDecimal targetBalance = accountService.checkBalance(2L);
@@ -66,10 +66,10 @@ class SpringbootTestApplicationTests {
 
 		verify(accountRepository,times(3)).findById(1L);
 		verify(accountRepository,times(3)).findById(2L);
-		verify(accountRepository,atMost(2)).update(any(Account.class));
+		verify(accountRepository,atMost(2)).save(any(Account.class));
 
 		verify(bankRepository,times(2)).findById(1L);
-		verify(bankRepository).update(any(Bank.class));
+		verify(bankRepository).save(any(Bank.class));
 
 		verify(accountRepository,times(6)).findById(anyLong());
 		verify(accountRepository,never()).findAll();
@@ -98,16 +98,16 @@ class SpringbootTestApplicationTests {
 
 		verify(accountRepository,times(3)).findById(1L);
 		verify(accountRepository,times(2)).findById(2L);
-		verify(accountRepository,never()).update(any(Account.class));
+		verify(accountRepository,never()).save(any(Account.class));
 
 		verify(bankRepository,times(1)).findById(1L);
-		verify(bankRepository,never()).update(any(Bank.class));
+		verify(bankRepository,never()).save(any(Bank.class));
 
 		verify(accountRepository,times(5)).findById(anyLong());
 		verify(accountRepository,never()).findAll();
 	}
 	@Test
-	void validAcount(){
+	void validAccount(){
 		when(accountRepository.findById(1L)).thenReturn(mockCreateAccount001());
 
 		var account01 = accountService.findById(1L);

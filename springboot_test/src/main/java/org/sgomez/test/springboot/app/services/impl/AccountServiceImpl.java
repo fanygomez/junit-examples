@@ -21,20 +21,24 @@ public class AccountServiceImpl implements IAccountService {
     @Override
     public Account findById(Long id) {
         System.out.println("AccountServiceImpl.findById");
-        return accountRepository.findById(id);
+        return accountRepository.findById(id).orElseThrow();
+    }
+    public Bank bankFindById(Long id) {
+        System.out.println("AccountServiceImpl.bankFindById");
+        return bankRepository.findById(id).orElseThrow();
     }
 
     @Override
     public int checkTotalTransfers(Long bankId) {
         System.out.println("AccountServiceImpl.checkTotalTransfers");
-        Bank bank = bankRepository.findById(bankId);
+        Bank bank = bankFindById(bankId);
         return bank.getNTransferencias();
     }
 
     @Override
     public BigDecimal checkBalance(Long accountId) {
         System.out.println("AccountServiceImpl.checkBalance");
-        Account account = accountRepository.findById(accountId);
+        Account account = findById(accountId);
         return account.getBalance();
     }
 
@@ -43,16 +47,16 @@ public class AccountServiceImpl implements IAccountService {
         
         System.out.println("AccountServiceImpl.transfer");
 
-        Account accountOrigen = accountRepository.findById(accountOrigin);
+        Account accountOrigen = findById(accountOrigin);
         accountOrigen.debit(amount);
 
-        Account accountDest = accountRepository.findById(accountTarget);
+        Account accountDest = findById(accountTarget);
         accountDest.credit(amount);
 
-        Bank bank = bankRepository.findById(bankId);
+        Bank bank = bankFindById(bankId);
         int totalTransfers = bank.getNTransferencias();
         bank.setNTransferencias(++totalTransfers);
-        bankRepository.update(bank);
+        bankRepository.save(bank);
 
     }
 }
