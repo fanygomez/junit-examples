@@ -6,8 +6,11 @@ import org.sgomez.test.springboot.app.repositories.AccountRepository;
 import org.sgomez.test.springboot.app.repositories.BankRepository;
 import org.sgomez.test.springboot.app.services.IAccountService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
+
 @Service
 public class AccountServiceImpl implements IAccountService {
     private  AccountRepository accountRepository;
@@ -19,16 +22,31 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
+    @Transactional // Para escritura
+    public Account save(Account account) {
+        System.out.println("AccountServiceImpl.save");
+        return accountRepository.save(account);
+    }
+    @Override
+    @Transactional(readOnly = true)
     public Account findById(Long id) {
         System.out.println("AccountServiceImpl.findById");
         return accountRepository.findById(id).orElseThrow();
     }
+    @Override
+    @Transactional(readOnly = true)
+    public List<Account> findAll() {
+        System.out.println("AccountServiceImpl.findAll");
+        return accountRepository.findAll();
+    }
+    @Transactional(readOnly = true)
     public Bank bankFindById(Long id) {
         System.out.println("AccountServiceImpl.bankFindById");
         return bankRepository.findById(id).orElseThrow();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public int checkTotalTransfers(Long bankId) {
         System.out.println("AccountServiceImpl.checkTotalTransfers");
         Bank bank = bankFindById(bankId);
@@ -36,13 +54,14 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BigDecimal checkBalance(Long accountId) {
         System.out.println("AccountServiceImpl.checkBalance");
         Account account = findById(accountId);
         return account.getBalance();
     }
-
     @Override
+    @Transactional
     public void transfer(Long accountOrigin, Long accountTarget, BigDecimal amount, Long bankId) {
         
         System.out.println("AccountServiceImpl.transfer");

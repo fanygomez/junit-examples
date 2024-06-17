@@ -1,26 +1,22 @@
 package org.sgomez.test.springboot.app;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.sgomez.test.springboot.app.services.Data.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.sgomez.test.springboot.app.exceptions.MoneyIsNotEnoughException;
 import org.sgomez.test.springboot.app.models.Account;
 import org.sgomez.test.springboot.app.models.Bank;
 import org.sgomez.test.springboot.app.repositories.AccountRepository;
 import org.sgomez.test.springboot.app.repositories.BankRepository;
-import org.sgomez.test.springboot.app.services.Data;
-import org.sgomez.test.springboot.app.services.IAccountService;
 import org.sgomez.test.springboot.app.services.impl.AccountServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.sgomez.test.springboot.app.services.Data.*;
 
 @SpringBootTest
 class SpringbootTestApplicationTests {
@@ -117,5 +113,38 @@ class SpringbootTestApplicationTests {
 		assertEquals("Fanny",account01.getPerson());
 
 		verify(accountRepository, times(2)).findById(anyLong());
+	}
+	@Test
+	void save() {
+		// Given
+		when(accountRepository.save(any())).then(invocation ->{
+			Account c = invocation.getArgument(0);
+			c.setId(3L);
+			return c;
+		});
+
+		// When
+		var accountCreated = accountService.save(mockCreateAccount003().orElseThrow());
+
+		// Then
+		assertEquals("Hector", accountCreated.getPerson());
+		assertEquals(3, accountCreated.getId());
+		assertEquals("1500", accountCreated.getBalance().toPlainString());
+
+		verify(accountRepository).save(any());
+	}
+
+	@Test
+	void findAll() {
+		// Given
+		when(accountRepository.findAll()).thenReturn(mockCreateAccountsList());
+		// When
+		var accountList = accountService.findAll();
+		// Then
+		assertFalse(accountList.isEmpty());
+		assertEquals(2, accountList.size());
+		assertTrue(accountList.contains(mockCreateAccount002().orElseThrow()));
+
+		verify(accountRepository).findAll();
 	}
 }
