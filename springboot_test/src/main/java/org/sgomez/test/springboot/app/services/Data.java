@@ -20,7 +20,10 @@ public class Data {
         return Optional.of(new Account(2L, "Ale", new BigDecimal("2000")));
     }
     public static Optional<Account> mockCreateAccount003(){
-        return Optional.of(new Account(null, "Hector", new BigDecimal("1500")));
+        return Optional.of(new Account(3L, "Hector", new BigDecimal("1500")));
+    }
+    public static Optional<Account> mockCreateAccount004(){
+        return Optional.of(new Account(4L, "Cristian", new BigDecimal("1000")));
     }
     public static List<Account> mockCreateAccountsList(){
         return Arrays.asList(mockCreateAccount001().orElseThrow(), mockCreateAccount002().orElseThrow());

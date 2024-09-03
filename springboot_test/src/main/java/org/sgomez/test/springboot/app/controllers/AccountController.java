@@ -11,9 +11,9 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController()
 @RequestMapping("/api/v1/accounts")
@@ -27,9 +27,16 @@ public class AccountController {
         return accountService.findAll();
     }
     @GetMapping("/{id}")
-    @ResponseStatus(OK)
-    public Account detail(@PathVariable Long id) {
-        return accountService.findById(id);
+//    @ResponseStatus(OK)
+    public ResponseEntity<Account> detail(@PathVariable Long id) {
+        Account account = null;
+        try {
+            account = accountService.findById(id);
+        }catch (NoSuchElementException e){
+            return ResponseEntity.notFound().build();
+
+        }
+        return ResponseEntity.ok(account);
     }
     @PostMapping
     @ResponseStatus(CREATED)
@@ -49,5 +56,10 @@ public class AccountController {
         response.put("transaction", requestDto);
 
         return ResponseEntity.ok(response);
+    }
+    @DeleteMapping("/{id}")
+    @ResponseStatus(NO_CONTENT)
+    public void delete(@PathVariable Long id){
+        accountService.deleteById(id);
     }
 }

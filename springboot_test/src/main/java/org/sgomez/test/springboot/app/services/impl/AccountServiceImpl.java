@@ -78,4 +78,10 @@ public class AccountServiceImpl implements IAccountService {
         bankRepository.save(bank);
 
     }
+
+    @Override
+    public void deleteById(Long id) {
+        System.out.println("AccountServiceImpl.deleteById {}"+ id);
+        accountRepository.deleteById(id);
+    }
 }

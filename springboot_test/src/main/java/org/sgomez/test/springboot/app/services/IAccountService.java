@@ -12,4 +12,5 @@ public interface IAccountService {
     int checkTotalTransfers(Long bankId);
     BigDecimal checkBalance(Long accountId);
     void transfer(Long accountOrigin,Long accountTarget, BigDecimal amount, Long bankId);
+    void deleteById(Long id);
 }

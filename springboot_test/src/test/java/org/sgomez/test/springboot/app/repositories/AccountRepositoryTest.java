@@ -18,7 +18,7 @@ class AccountRepositoryTest {
     void testFindById() {
         var  account = accountRepository.findById(1L);
         assertTrue(account.isPresent());
-        assertEquals("Ale", account.orElseThrow().getPerson());
+        assertEquals("Fanny", account.orElseThrow().getPerson());
     }
     @Test
     void testFindByPerson() {
@@ -76,8 +76,8 @@ class AccountRepositoryTest {
     void testDelete(){
         var accountFound = accountRepository.findById(2L).orElseThrow();
 
-        assertEquals("Fanny", accountFound.getPerson());
-        assertEquals("850.00", accountFound.getBalance().toPlainString());
+        assertEquals("Ale", accountFound.getPerson());
+        assertEquals("2000.00", accountFound.getBalance().toPlainString());
 
         accountRepository.delete(accountFound);
 
