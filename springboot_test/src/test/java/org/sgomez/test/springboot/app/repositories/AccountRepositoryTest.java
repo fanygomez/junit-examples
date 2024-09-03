@@ -1,6 +1,6 @@
 package org.sgomez.test.springboot.app.repositories;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.sgomez.test.springboot.app.models.Account;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
+@Tag("integration_jpa")
 @DataJpaTest
 class AccountRepositoryTest {
     @Autowired
